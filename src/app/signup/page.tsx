@@ -18,11 +18,13 @@ import Link from 'next/link';
 import { useAuth, useUser } from '@/firebase';
 import { initiateEmailSignUp } from '@/firebase/non-blocking-login';
 import { GoogleAuthProvider, signInWithPopup, AuthError } from 'firebase/auth';
-import { Chrome, Loader2 } from 'lucide-react';
+import { Chrome, Loader2, AlertCircle } from 'lucide-react';
 import Logo from '@/components/logo';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+
 
 const formSchema = z.object({
   fullName: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
@@ -40,6 +42,7 @@ export default function SignUpPage() {
   const { user, isUserLoading } = useUser();
   const router = useRouter();
   const { toast } = useToast();
+  const [popupError, setPopupError] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -60,19 +63,23 @@ export default function SignUpPage() {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     if (!auth) return;
+    setPopupError(null);
     initiateEmailSignUp(auth, values.email, values.password);
   }
 
   const handleGoogleSignIn = async () => {
     if (!auth) return;
+    setPopupError(null);
     const provider = new GoogleAuthProvider();
     try {
       await signInWithPopup(auth, provider);
     } catch (error) {
       if ((error as AuthError).code === 'auth/popup-blocked') {
+        setPopupError('Your browser blocked the Google Sign-In popup. Please allow popups for this site and try again.');
+      } else {
         toast({
-          title: 'Popup Blocked',
-          description: 'Please allow popups for this site to sign in with Google.',
+          title: 'Sign-up Error',
+          description: 'An unexpected error occurred. Please try again.',
           variant: 'destructive',
         });
       }
@@ -108,6 +115,15 @@ export default function SignUpPage() {
               <CardDescription>Create your account to get started.</CardDescription>
             </CardHeader>
             <CardContent>
+              {popupError && (
+                <Alert variant="destructive" className="mb-4">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle>Google Sign-In Blocked</AlertTitle>
+                  <AlertDescription>
+                    {popupError}
+                  </AlertDescription>
+                </Alert>
+              )}
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                   <FormField
