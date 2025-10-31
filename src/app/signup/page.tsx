@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useForm } from 'react-hook-form';
@@ -105,11 +106,11 @@ export default function SignUpPage() {
          </div>
       </div>
       <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-background">
-        <div className="w-full max-w-md space-y-8">
-          <div className="flex justify-center w-full">
+        <div className="w-full max-w-md space-y-6">
+          <div className="flex justify-center w-full lg:hidden">
               <Logo />
           </div>
-          <Card className="shadow-2xl rounded-2xl">
+          <Card className="shadow-2xl rounded-2xl w-full">
             <CardHeader className="text-center">
               <CardTitle className="text-3xl font-bold tracking-tight font-headline">Sign Up</CardTitle>
               <CardDescription>Create your account to get started.</CardDescription>
