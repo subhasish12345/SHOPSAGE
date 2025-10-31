@@ -21,8 +21,8 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   AuthError,
+  signInWithEmailAndPassword,
 } from 'firebase/auth';
-import { initiateEmailSignIn } from '@/firebase/non-blocking-login';
 import { Chrome, Loader2, AlertCircle } from 'lucide-react';
 import Logo from '@/components/logo';
 import { useEffect, useState } from 'react';
@@ -42,6 +42,8 @@ export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [popupError, setPopupError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false);
 
 
   useEffect(() => {
@@ -59,18 +61,33 @@ export default function LoginPage() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     if (!auth) return;
     setPopupError(null);
-    initiateEmailSignIn(auth, values.email, values.password);
+    setIsSubmitting(true);
+    try {
+      await signInWithEmailAndPassword(auth, values.email, values.password);
+      // Let the useUser hook handle redirection
+    } catch (error: any) {
+      console.error('Error during email sign-in:', error);
+      toast({
+        title: 'Sign-in Error',
+        description: 'Invalid email or password. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   const handleGoogleSignIn = async () => {
     if (!auth) return;
     setPopupError(null);
+    setIsGoogleSubmitting(true);
     const provider = new GoogleAuthProvider();
     try {
       await signInWithPopup(auth, provider);
+      // Let the useUser hook handle redirection
     } catch (error) {
       if ((error as AuthError).code === 'auth/popup-blocked') {
         setPopupError('Your browser blocked the Google Sign-In popup. Please allow popups for this site and try again.');
@@ -82,6 +99,8 @@ export default function LoginPage() {
         });
       }
       console.error('Error during Google sign-in:', error);
+    } finally {
+        setIsGoogleSubmitting(false);
     }
   };
 
@@ -96,18 +115,20 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen w-full lg:grid lg:grid-cols-2">
       <div className="relative hidden lg:flex flex-col items-center justify-center p-12 bg-muted overflow-hidden">
+         <div className="absolute inset-0 bg-gradient-to-br from-sky-100 to-blue-200 animate-gradient" />
          <FloatingShapes />
          <div className="relative z-10 text-center">
             <h1 className="text-4xl font-bold tracking-tight font-headline text-slate-800">Welcome back to ShopSage</h1>
             <p className="mt-4 text-lg text-slate-700/80">Grow Smarter, Sell Faster.</p>
          </div>
       </div>
-      <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-background">
-        <div className="w-full max-w-md space-y-8">
+      <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-background relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-white via-stone-50 to-zinc-100 animate-gradient lg:hidden" />
+        <div className="w-full max-w-md space-y-8 z-10">
           <div className="flex justify-center w-full">
               <Logo />
           </div>
-          <Card className="shadow-2xl rounded-2xl">
+          <Card className="shadow-2xl rounded-2xl bg-white/60 backdrop-blur-lg border-white/30">
             <CardHeader className="text-center">
               <CardTitle className="text-3xl font-bold tracking-tight font-headline">Login</CardTitle>
               <CardDescription>Enter your credentials to access your account</CardDescription>
@@ -155,7 +176,8 @@ export default function LoginPage() {
                       </FormItem>
                     )}
                   />
-                  <Button type="submit" className="w-full !mt-8 h-12 text-base font-semibold hover:scale-[1.03] transition-transform hover:shadow-primary/50 shadow-lg">
+                  <Button type="submit" className="w-full !mt-8 h-12 text-base font-semibold hover:scale-[1.03] transition-transform hover:shadow-primary/50 shadow-lg" disabled={isSubmitting}>
+                     {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     Login
                   </Button>
                 </form>
@@ -171,8 +193,8 @@ export default function LoginPage() {
                 </div>
               </div>
               <div className="grid grid-cols-1">
-                  <Button variant="outline" className="h-12 text-base" onClick={handleGoogleSignIn}>
-                    <Chrome className="mr-2 h-5 w-5" />
+                  <Button variant="outline" className="h-12 text-base" onClick={handleGoogleSignIn} disabled={isGoogleSubmitting}>
+                    {isGoogleSubmitting ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Chrome className="mr-2 h-5 w-5" />}
                     Google
                   </Button>
               </div>

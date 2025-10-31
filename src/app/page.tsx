@@ -31,7 +31,7 @@ export default function Home() {
 
   return (
     <div className="relative flex flex-col items-center justify-center min-h-screen bg-background overflow-hidden">
-      <FloatingShapes opacity="opacity-30" />
+      <FloatingShapes opacity="opacity-60" />
       <div className="relative z-10 text-center p-4">
         <h1 className="text-4xl md:text-5xl font-bold mb-4 text-foreground">Welcome to ShopSage</h1>
         <p className="mb-8 text-muted-foreground">

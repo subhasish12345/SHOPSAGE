@@ -48,6 +48,9 @@ export default function SignUpPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [popupError, setPopupError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false);
+
 
   useEffect(() => {
     if (user) {
@@ -68,6 +71,7 @@ export default function SignUpPage() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     if (!auth) return;
     setPopupError(null);
+    setIsSubmitting(true);
     
     try {
         await createUserWithEmailAndPassword(auth, values.email, values.password);
@@ -85,12 +89,15 @@ export default function SignUpPage() {
             description: description,
             variant: 'destructive',
         });
+    } finally {
+        setIsSubmitting(false);
     }
   }
 
   const handleGoogleSignIn = async () => {
     if (!auth) return;
     setPopupError(null);
+    setIsGoogleSubmitting(true);
     const provider = new GoogleAuthProvider();
     try {
       await signInWithPopup(auth, provider);
@@ -105,6 +112,8 @@ export default function SignUpPage() {
         });
       }
       console.error('Error during Google sign-in:', error);
+    } finally {
+        setIsGoogleSubmitting(false);
     }
   };
 
@@ -119,18 +128,20 @@ export default function SignUpPage() {
   return (
     <div className="min-h-screen w-full lg:grid lg:grid-cols-2">
        <div className="relative hidden lg:flex flex-col items-center justify-center p-12 bg-muted overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-sky-100 to-blue-200 animate-gradient" />
          <FloatingShapes />
          <div className="relative z-10 text-center">
             <h1 className="text-4xl font-bold tracking-tight font-headline text-slate-800">Create Your ShopSage Account</h1>
             <p className="mt-4 text-lg text-slate-700/80">Join as a User today. You can apply to become a Seller anytime.</p>
          </div>
       </div>
-      <div className="flex items-center justify-center py-6 sm:py-12 px-4 sm:px-6 lg:px-8 bg-background">
-        <div className="w-full max-w-md space-y-4">
+      <div className="flex items-center justify-center py-6 sm:py-12 px-4 sm:px-6 lg:px-8 bg-background relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-white via-stone-50 to-zinc-100 animate-gradient lg:hidden" />
+        <div className="w-full max-w-md space-y-4 z-10">
           <div className="flex justify-center w-full lg:hidden">
               <Logo />
           </div>
-          <Card className="shadow-2xl rounded-2xl w-full">
+          <Card className="shadow-2xl rounded-2xl w-full bg-white/60 backdrop-blur-lg border-white/30">
             <CardHeader className="text-center">
               <CardTitle className="text-2xl font-bold tracking-tight font-headline">Sign Up</CardTitle>
               <CardDescription>Create your account to get started.</CardDescription>
@@ -199,7 +210,8 @@ export default function SignUpPage() {
                       </FormItem>
                     )}
                   />
-                  <Button id="signup-button" type="submit" className="w-full !mt-4 h-10 text-base font-semibold hover:scale-[1.03] transition-transform hover:shadow-primary-50 shadow-lg">
+                  <Button id="signup-button" type="submit" className="w-full !mt-4 h-10 text-base font-semibold hover:scale-[1.03] transition-transform hover:shadow-primary-50 shadow-lg" disabled={isSubmitting}>
+                    {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     Sign Up
                   </Button>
                 </form>
@@ -214,8 +226,8 @@ export default function SignUpPage() {
                   </span>
                 </div>
               </div>
-              <Button variant="outline" className="w-full h-10 text-base" onClick={handleGoogleSignIn}>
-                <Chrome className="mr-2 h-5 w-5" />
+              <Button variant="outline" className="w-full h-10 text-base" onClick={handleGoogleSignIn} disabled={isGoogleSubmitting}>
+                 {isGoogleSubmitting ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Chrome className="mr-2 h-5 w-5" />}
                 Sign up with Google
               </Button>
                <p className="mt-4 px-8 text-center text-xs text-muted-foreground">

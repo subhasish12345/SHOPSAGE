@@ -24,7 +24,7 @@ type FloatingShapesProps = {
   opacity?: string;
 }
 
-const FloatingShapes = ({ opacity = 'opacity-10' }: FloatingShapesProps) => {
+const FloatingShapes = ({ opacity = 'opacity-60' }: FloatingShapesProps) => {
   return (
     <div className="absolute inset-0 w-full h-full overflow-hidden z-0">
       <ul className="floating-shapes">
