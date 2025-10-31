@@ -56,7 +56,8 @@ export default function SignUpPage() {
     const provider = new GoogleAuthProvider();
     try {
       await signInWithPopup(auth, provider);
-    } catch (error)      console.error('Error during Google sign-in:', error);
+    } catch (error) {
+      console.error('Error during Google sign-in:', error);
     }
   };
 
