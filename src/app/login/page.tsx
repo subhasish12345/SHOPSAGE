@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useForm } from 'react-hook-form';
@@ -22,18 +23,16 @@ import {
   AuthError,
 } from 'firebase/auth';
 import { initiateEmailSignIn } from '@/firebase/non-blocking-login';
-import { Chrome, Loader2, Phone, AlertCircle } from 'lucide-react';
+import { Chrome, Loader2, AlertCircle } from 'lucide-react';
 import Logo from '@/components/logo';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { signInWithPhoneNumber } from 'firebase/auth';
-import { setupRecaptcha } from '@/firebase/auth/phone-auth';
 
 const formSchema = z.object({
-  emailOrPhone: z.string().min(1, { message: 'Email or Phone is required.' }),
-  password: z.string().min(6, { message: 'Password must be at least 6 characters.' }),
+  email: z.string().email({ message: 'Please enter a valid email.' }),
+  password: z.string().min(1, { message: 'Password is required.' }),
 });
 
 export default function LoginPage() {
@@ -54,7 +53,7 @@ export default function LoginPage() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      emailOrPhone: '',
+      email: '',
       password: '',
     },
   });
@@ -62,33 +61,8 @@ export default function LoginPage() {
   function onSubmit(values: z.infer<typeof formSchema>) {
     if (!auth) return;
     setPopupError(null);
-    initiateEmailSignIn(auth, values.emailOrPhone, values.password);
+    initiateEmailSignIn(auth, values.email, values.password);
   }
-
-  const handlePhoneSignIn = async () => {
-    if (!auth) return;
-    const phoneNumber = prompt("Please enter your phone number with country code (e.g., +1234567890)");
-    if (!phoneNumber) return;
-
-    try {
-        const appVerifier = await setupRecaptcha('phone-signin-button');
-        const confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, appVerifier);
-        
-        const verificationCode = prompt("Please enter the verification code sent to your phone.");
-        if (verificationCode) {
-            await confirmationResult.confirm(verificationCode);
-            // User is signed in. The useUser hook will handle redirection.
-        }
-    } catch (error) {
-        console.error("Error during phone sign-in:", error);
-        toast({
-            title: 'Phone Sign-in Error',
-            description: 'Could not sign in with phone. Please check the number and try again.',
-            variant: 'destructive',
-        });
-    }
-  };
-
 
   const handleGoogleSignIn = async () => {
     if (!auth) return;
@@ -151,7 +125,7 @@ export default function LoginPage() {
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                   <FormField
                     control={form.control}
-                    name="emailOrPhone"
+                    name="email"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Email</FormLabel>
@@ -195,14 +169,10 @@ export default function LoginPage() {
                   </span>
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1">
                   <Button variant="outline" className="h-12 text-base" onClick={handleGoogleSignIn}>
                     <Chrome className="mr-2 h-5 w-5" />
                     Google
-                  </Button>
-                  <Button id="phone-signin-button" variant="outline" className="h-12 text-base" onClick={handlePhoneSignIn}>
-                    <Phone className="mr-2 h-5 w-5" />
-                    Phone
                   </Button>
               </div>
               <p className="mt-8 text-center text-sm text-muted-foreground">

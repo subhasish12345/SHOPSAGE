@@ -22,7 +22,6 @@ import {
   signInWithPopup, 
   AuthError,
   createUserWithEmailAndPassword,
-  signInWithPhoneNumber
 } from 'firebase/auth';
 import { Chrome, Loader2, AlertCircle } from 'lucide-react';
 import Logo from '@/components/logo';
@@ -30,13 +29,11 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { setupRecaptcha, checkPhoneNumberExists } from '@/firebase/auth/phone-auth';
 
 
 const formSchema = z.object({
   fullName: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
   email: z.string().email({ message: 'Invalid email address.' }),
-  phone: z.string().min(10, { message: 'Please enter a valid phone number.' }),
   password: z.string().min(6, { message: 'Password must be at least 6 characters.' }),
   confirmPassword: z.string(),
 }).refine(data => data.password === data.confirmPassword, {
@@ -62,7 +59,6 @@ export default function SignUpPage() {
     defaultValues: {
       fullName: '',
       email: '',
-      phone: '',
       password: '',
       confirmPassword: '',
     },
@@ -71,32 +67,21 @@ export default function SignUpPage() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     if (!auth) return;
     setPopupError(null);
-
-    const phoneExists = await checkPhoneNumberExists(values.phone);
-    if (phoneExists) {
-        form.setError('phone', { type: 'manual', message: 'This phone number is already in use.' });
-        return;
-    }
     
     try {
-        const appVerifier = await setupRecaptcha('signup-button');
-        const confirmationResult = await signInWithPhoneNumber(auth, values.phone, appVerifier);
-        
-        const verificationCode = prompt("Please enter the verification code sent to your phone.");
-        
-        if (verificationCode) {
-            await confirmationResult.confirm(verificationCode);
-            // User is signed in with phone, now create email/password credential and link it.
-            // This is a simplified flow. For a real app, you might link credentials.
-            // For now, we will create a new user with email/password.
-            // But firebase auth will handle this for the currently logged in user.
-            await createUserWithEmailAndPassword(auth, values.email, values.password);
-        }
-    } catch (error) {
+        await createUserWithEmailAndPassword(auth, values.email, values.password);
+        // The useUser hook and useCreateUser will handle redirection and db entry.
+    } catch (error: any) {
         console.error("Error during sign up:", error);
+        
+        let description = 'Could not complete sign up. Please try again.';
+        if (error.code === 'auth/email-already-in-use') {
+            description = 'This email address is already in use by another account.';
+        }
+
         toast({
             title: 'Sign-up Error',
-            description: 'Could not complete sign up. Please try again.',
+            description: description,
             variant: 'destructive',
         });
     }
@@ -139,7 +124,7 @@ export default function SignUpPage() {
             <p className="mt-4 text-lg text-primary-foreground/80">Join as a User today. You can apply to become a Seller anytime.</p>
          </div>
       </div>
-      <div className="flex items-center justify-center py-6 px-4 sm:px-6 lg:px-8 bg-background">
+      <div className="flex items-center justify-center py-6 sm:py-12 px-4 sm:px-6 lg:px-8 bg-background">
         <div className="w-full max-w-md space-y-4">
           <div className="flex justify-center w-full lg:hidden">
               <Logo />
@@ -182,19 +167,6 @@ export default function SignUpPage() {
                         <FormLabel>Email</FormLabel>
                         <FormControl>
                           <Input placeholder="you@example.com" {...field} className="h-10 focus:border-primary focus:shadow-sm" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                   <FormField
-                    control={form.control}
-                    name="phone"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Phone Number</FormLabel>
-                        <FormControl>
-                          <Input placeholder="+1 234 567 890" {...field} className="h-10 focus:border-primary focus:shadow-sm" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
