@@ -3,10 +3,20 @@
 import React, { useMemo, type ReactNode } from 'react';
 import { FirebaseProvider } from '@/firebase/provider';
 import { initializeFirebase } from '@/firebase';
+import { useCreateUser } from '@/firebase/auth/use-create-user';
 
 interface FirebaseClientProviderProps {
   children: ReactNode;
 }
+
+function InnerFirebaseClientProvider({ children }: FirebaseClientProviderProps) {
+  // This custom hook will automatically create a user document in Firestore
+  // when a new user signs up or logs in for the first time.
+  useCreateUser();
+
+  return <>{children}</>;
+}
+
 
 export function FirebaseClientProvider({ children }: FirebaseClientProviderProps) {
   const firebaseServices = useMemo(() => {
@@ -20,7 +30,9 @@ export function FirebaseClientProvider({ children }: FirebaseClientProviderProps
       auth={firebaseServices.auth}
       firestore={firebaseServices.firestore}
     >
-      {children}
+      <InnerFirebaseClientProvider>
+        {children}
+      </InnerFirebaseClientProvider>
     </FirebaseProvider>
   );
 }
