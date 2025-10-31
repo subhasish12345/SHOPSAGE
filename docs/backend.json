@@ -1,0 +1,558 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user of the e-commerce platform.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the user entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The user's full name."
+        },
+        "email": {
+          "type": "string",
+          "description": "The user's email address.",
+          "format": "email"
+        },
+        "phone": {
+          "type": "string",
+          "description": "The user's phone number."
+        },
+        "profilePic": {
+          "type": "string",
+          "description": "URL of the user's profile picture."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the user account was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the user account was last updated.",
+          "format": "date-time"
+        },
+        "addressId": {
+          "type": "string",
+          "description": "Reference to Address. (Relationship: User 1:N Address)"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "email",
+        "createdAt"
+      ]
+    },
+    "Seller": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Seller",
+      "type": "object",
+      "description": "Represents a seller on the e-commerce platform.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the seller entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The seller's store name."
+        },
+        "email": {
+          "type": "string",
+          "description": "The seller's email address.",
+          "format": "email"
+        },
+        "phone": {
+          "type": "string",
+          "description": "The seller's phone number."
+        },
+        "bankDetails": {
+          "type": "string",
+          "description": "The seller's bank account details (encrypted)."
+        },
+        "verified": {
+          "type": "boolean",
+          "description": "Indicates whether the seller is verified by the admin."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the seller account was created.",
+          "format": "date-time"
+        },
+        "metrics": {
+          "type": "string",
+          "description": "Stringified metrics for the seller, e.g., rating, totalSales, returnsRate"
+        },
+        "addressId": {
+          "type": "string",
+          "description": "Reference to Address. (Relationship: Seller 1:N Address)"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "email",
+        "bankDetails",
+        "verified",
+        "createdAt"
+      ]
+    },
+    "Admin": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Admin",
+      "type": "object",
+      "description": "Represents an administrator of the e-commerce platform.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the admin entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The admin's full name."
+        },
+        "email": {
+          "type": "string",
+          "description": "The admin's email address.",
+          "format": "email"
+        },
+        "role": {
+          "type": "string",
+          "description": "The admin's role (e.g., superAdmin, moderator)."
+        },
+        "permissions": {
+          "type": "array",
+          "description": "List of permissions assigned to the admin.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the admin account was created.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "email",
+        "role",
+        "createdAt"
+      ]
+    },
+    "Address": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Address",
+      "type": "object",
+      "description": "Represents a user's address.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the address entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N Address)"
+        },
+        "sellerId": {
+          "type": "string",
+          "description": "Reference to Seller. (Relationship: Seller 1:N Address)"
+        },
+        "street": {
+          "type": "string",
+          "description": "Street address."
+        },
+        "city": {
+          "type": "string",
+          "description": "City."
+        },
+        "state": {
+          "type": "string",
+          "description": "State."
+        },
+        "zipCode": {
+          "type": "string",
+          "description": "Zip code."
+        },
+        "country": {
+          "type": "string",
+          "description": "Country."
+        },
+        "latitude": {
+          "type": "number",
+          "description": "Latitude coordinate."
+        },
+        "longitude": {
+          "type": "number",
+          "description": "Longitude coordinate."
+        }
+      },
+      "required": [
+        "id",
+        "street",
+        "city",
+        "state",
+        "zipCode",
+        "country"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user profiles. Includes denormalized 'userId' for authorization independence.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/addresses/{addressId}",
+        "definition": {
+          "entityName": "Address",
+          "schema": {
+            "$ref": "#/backend/entities/Address"
+          },
+          "description": "Stores addresses associated with a user. Addresses can only be created, read, updated, or deleted by the user.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            },
+            {
+              "name": "addressId",
+              "description": "The unique identifier for the address."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/sellers/{sellerId}",
+        "definition": {
+          "entityName": "Seller",
+          "schema": {
+            "$ref": "#/backend/entities/Seller"
+          },
+          "description": "Stores seller profiles.  Includes 'sellerId' as the document ID.",
+          "params": [
+            {
+              "name": "sellerId",
+              "description": "The unique identifier for the seller."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/products/{productId}",
+        "definition": {
+          "entityName": "Product",
+          "schema": {
+            "$ref": "#/backend/entities/Product"
+          },
+          "description": "Stores product information. Includes denormalized 'sellerId' to allow sellers to manage their products.",
+          "params": [
+            {
+              "name": "productId",
+              "description": "The unique identifier for the product."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/admins/{adminId}",
+        "definition": {
+          "entityName": "Admin",
+          "schema": {
+            "$ref": "#/backend/entities/Admin"
+          },
+          "description": "Stores admin profiles. Includes 'adminId' as the document ID.",
+          "params": [
+            {
+              "name": "adminId",
+              "description": "The unique identifier for the admin."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/orders/{orderId}",
+        "definition": {
+          "entityName": "Order",
+          "schema": {
+            "$ref": "#/backend/entities/Order"
+          },
+          "description": "Stores order information. Includes 'userId' and 'sellerId' for relationship and query purposes.",
+          "params": [
+            {
+              "name": "orderId",
+              "description": "The unique identifier for the order."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/payments/{paymentId}",
+        "definition": {
+          "entityName": "Payment",
+          "schema": {
+            "$ref": "#/backend/entities/Payment"
+          },
+          "description": "Stores payment information related to orders.",
+          "params": [
+            {
+              "name": "paymentId",
+              "description": "The unique identifier for the payment."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/support_tickets/{ticketId}",
+        "definition": {
+          "entityName": "SupportTicket",
+          "schema": {
+            "$ref": "#/backend/entities/SupportTicket"
+          },
+          "description": "Stores support tickets raised by users.",
+          "params": [
+            {
+              "name": "ticketId",
+              "description": "The unique identifier for the support ticket."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/refund_flags/{refundId}",
+        "definition": {
+          "entityName": "RefundFlag",
+          "schema": {
+            "$ref": "#/backend/entities/RefundFlag"
+          },
+          "description": "Stores refund flags raised by support agents.",
+          "params": [
+            {
+              "name": "refundId",
+              "description": "The unique identifier for the refund flag."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/campaigns/{campaignId}",
+        "definition": {
+          "entityName": "Campaign",
+          "schema": {
+            "$ref": "#/backend/entities/Campaign"
+          },
+          "description": "Stores marketing campaign information.",
+          "params": [
+            {
+              "name": "campaignId",
+              "description": "The unique identifier for the marketing campaign."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/coupons/{couponId}",
+        "definition": {
+          "entityName": "Coupon",
+          "schema": {
+            "$ref": "#/backend/entities/Coupon"
+          },
+          "description": "Stores coupon information.",
+          "params": [
+            {
+              "name": "couponId",
+              "description": "The unique identifier for the coupon."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/transactions/{transactionId}",
+        "definition": {
+          "entityName": "Transaction",
+          "schema": {
+            "$ref": "#/backend/entities/Transaction"
+          },
+          "description": "Stores transaction history.",
+          "params": [
+            {
+              "name": "transactionId",
+              "description": "The unique identifier for the transaction."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/payouts/{payoutId}",
+        "definition": {
+          "entityName": "Payout",
+          "schema": {
+            "$ref": "#/backend/entities/Payout"
+          },
+          "description": "Stores seller payout information.",
+          "params": [
+            {
+              "name": "payoutId",
+              "description": "The unique identifier for the payout."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/reports/{reportId}",
+        "definition": {
+          "entityName": "Report",
+          "schema": {
+            "$ref": "#/backend/entities/Report"
+          },
+          "description": "Stores report data generated for analytics.",
+          "params": [
+            {
+              "name": "reportId",
+              "description": "The unique identifier for the report."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/site_config/{configId}",
+        "definition": {
+          "entityName": "SiteConfig",
+          "schema": {
+            "$ref": "#/backend/entities/SiteConfig"
+          },
+          "description": "Stores site-wide configuration settings.",
+          "params": [
+            {
+              "name": "configId",
+              "description": "The unique identifier for the site configuration."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/activity_logs/{logId}",
+        "definition": {
+          "entityName": "ActivityLog",
+          "schema": {
+            "$ref": "#/backend/entities/ActivityLog"
+          },
+          "description": "Stores logs of actions performed by users, admins, and sellers.",
+          "params": [
+            {
+              "name": "logId",
+              "description": "The unique identifier for the activity log entry."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/notifications/{notificationId}",
+        "definition": {
+          "entityName": "Notification",
+          "schema": {
+            "$ref": "#/backend/entities/Notification"
+          },
+          "description": "Stores notifications to be sent to users.",
+          "params": [
+            {
+              "name": "notificationId",
+              "description": "The unique identifier for the notification."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/support/{supportId}",
+        "definition": {
+          "entityName": "Support",
+          "schema": {
+            "$ref": "#/backend/entities/Support"
+          },
+          "description": "Stores support personnel information.",
+          "params": [
+            {
+              "name": "supportId",
+              "description": "The unique identifier for the support personnel."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/finance/{financeId}",
+        "definition": {
+          "entityName": "Finance",
+          "schema": {
+            "$ref": "#/backend/entities/Finance"
+          },
+          "description": "Stores finance personnel information.",
+          "params": [
+            {
+              "name": "financeId",
+              "description": "The unique identifier for the finance personnel."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/marketing/{marketerId}",
+        "definition": {
+          "entityName": "Marketing",
+          "schema": {
+            "$ref": "#/backend/entities/Marketing"
+          },
+          "description": "Stores marketing personnel information.",
+          "params": [
+            {
+              "name": "marketerId",
+              "description": "The unique identifier for the marketing personnel."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/data_entry/{entryId}",
+        "definition": {
+          "entityName": "DataEntry",
+          "schema": {
+            "$ref": "#/backend/entities/DataEntry"
+          },
+          "description": "Stores data entry personnel information.",
+          "params": [
+            {
+              "name": "entryId",
+              "description": "The unique identifier for the data entry personnel."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore data structure is designed to support a multi-role e-commerce platform, ShopSage, with clear separation of concerns and role-based access control. Authorization Independence is achieved by using path-based ownership for user-specific data (e.g., /users/{userId}/cart/{itemId}) and denormalizing authorization context where necessary, such as including sellerId in the products collection to allow sellers to manage only their products. The use of subcollections for cart, wishlist, and orders addresses the scalability concerns of large arrays inside documents. Segregation is achieved by dedicating collections to different roles (admins, sellers, support, etc.), ensuring that documents within a collection share the same security requirements, which helps to avoid complex rule logic. QAPs are supported via this segregation, with each collection having clear rules about who can list and what constraints apply to such lists."
+  }
+}

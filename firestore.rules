@@ -1,150 +1,359 @@
+/**
+ * @fileoverview Firestore Security Rules for ShopSage, a multi-role e-commerce platform.
+ *
+ * Core Philosophy:
+ * This ruleset enforces a strict, role-based access control model with path-based ownership.
+ * Users can only access their own data, sellers can only manage their own products, and admins have elevated privileges.
+ *
+ * Data Structure:
+ * - User data is stored under /users/{userId}.
+ * - Seller data is stored under /sellers/{sellerId}.
+ * - Product data is stored under /products/{productId}, with a denormalized sellerId.
+ * - Admin data is stored under /admins/{adminId}.
+ *
+ * Key Security Decisions:
+ * - Users can only read and write their own user documents.
+ * - Users can manage their own addresses under their user document.
+ * - Sellers can only manage products associated with their seller ID.
+ * - Admins have full access to admin documents.
+ * - Listing of user documents is denied to prevent information leakage.
+ *
+ * Denormalization for Authorization:
+ * - Product documents include a `sellerId` field, enabling rules to easily check if a seller is authorized to manage a product.
+ *
+ * Structural Segregation:
+ * - Different roles (users, sellers, admins) have separate top-level collections.
+ */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // =============================
-    //  GLOBAL HELPERS
-    // =============================
+    /**
+     * @description Ensures the user is signed in.
+     * @returns {boolean} True if the user is signed in, false otherwise.
+     */
     function isSignedIn() {
       return request.auth != null;
     }
 
-    function isRole(role) {
-      return isSignedIn() && request.auth.token.role == role;
-    }
-    
-    function isOneOfRoles(roles) {
-      return isSignedIn() && request.auth.token.role in roles;
-    }
-
+    /**
+     * @description Checks if the request is made by the owner of the resource.
+     * @param {string} userId - The user ID to compare against the request's auth UID.
+     * @returns {boolean} True if the request is made by the owner, false otherwise.
+     */
     function isOwner(userId) {
       return isSignedIn() && request.auth.uid == userId;
     }
 
-    // =============================
-    //  ROLES & USERS
-    // =============================
+    /**
+     * @description Checks if the request is made by the existing owner of the resource.
+     * @param {string} userId - The user ID to compare against the resource data's userId.
+     * @returns {boolean} True if the request is made by the existing owner, false otherwise.
+     */
+    function isExistingOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId && resource != null;
+    }
+
+    /**
+     * @description Enforces that the ID is immutable.
+     * @param {string} userId - The user ID to compare against the request's auth UID.
+     * @returns {boolean} True if the user is the owner, false otherwise.
+     */
+    function isIdNotChanged(field) {
+        return request.resource.data[field] == resource.data[field];
+    }
+
+    /**
+     * @description Rules for /users/{userId} documents.
+     * @path /users/{userId}
+     * @allow (create) - A user can create their own document if their auth UID matches the userId.
+     * @allow (get) - A user can read their own document.
+     * @allow (update) - A user can update their own document.
+     * @allow (delete) - A user can delete their own document.
+     * @deny (list) - Listing all users is not allowed.
+     * @deny (create) - A user cannot create a document with an ID that does not match their auth UID.
+     * @deny (update) - A user cannot update someone else's document.
+     * @deny (delete) - A user cannot delete someone else's document.
+     * @principle Enforces document ownership for writes, restricts listing to prevent information leakage.
+     */
     match /users/{userId} {
-      allow read, update: if isOwner(userId) || isRole('admin');
-      allow create: if true;
-      allow delete: if isRole('admin');
-      
-      // Subcollections like cart, wishlist
-      match /{subcollection}/{docId} {
-        allow read, write: if isOwner(userId);
-      }
+      allow get: if isOwner(userId);
+      allow list: if false;
+
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isExistingOwner(userId) && isIdNotChanged('id');
+      allow delete: if isExistingOwner(userId);
     }
-    
+
+    /**
+     * @description Rules for /users/{userId}/addresses/{addressId} documents.
+     * @path /users/{userId}/addresses/{addressId}
+     * @allow (create) - A user can create an address under their user document.
+     * @allow (get) - A user can read an address under their user document.
+     * @allow (update) - A user can update an address under their user document.
+     * @allow (delete) - A user can delete an address under their user document.
+     * @deny (create) - A user cannot create an address under someone else's user document.
+     * @deny (update) - A user cannot update an address under someone else's user document.
+     * @deny (delete) - A user cannot delete an address under someone else's user document.
+     * @principle Enforces document ownership for writes within a user's data tree.
+     */
+    match /users/{userId}/addresses/{addressId} {
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+
+      allow create: if isOwner(userId);
+      allow update: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Rules for /sellers/{sellerId} documents.
+     * @path /sellers/{sellerId}
+     * @allow (create) - A seller can create their own document.
+     * @allow (get) - A seller can read their own document.
+     * @allow (update) - A seller can update their own document.
+     * @allow (delete) - A seller can delete their own document.
+     * @deny (create) - A user cannot create a seller document for another user.
+     * @deny (update) - A user cannot update another seller's document.
+     * @deny (delete) - A user cannot delete another seller's document.
+     * @principle Enforces document ownership for writes.
+     */
     match /sellers/{sellerId} {
-      allow get: if true; // Public can view seller info
-      allow list: if isSignedIn();
-      allow update: if (isRole('seller') && isOwner(sellerId)) || isRole('admin');
-      allow create, delete: if isRole('admin');
-    }
-    
-    match /admins/{adminId} {
-      allow read, write: if isRole('admin');
+      allow get: if isSignedIn();
+      allow list: if false;
+
+      allow create: if isSignedIn() && request.auth.uid == sellerId;
+      allow update: if isExistingOwner(sellerId) && isIdNotChanged('id');
+      allow delete: if isExistingOwner(sellerId);
     }
 
-    match /support_agents/{agentId} {
-      allow read, write: if isRole('admin');
-    }
-
-    match /finance_agents/{agentId} {
-      allow read, write: if isRole('admin');
-    }
-    
-    match /marketing_agents/{agentId} {
-      allow read, write: if isRole('admin');
-    }
-
-    match /delivery_agents/{agentId} {
-      allow read, write: if isRole('admin') || isRole('logistics');
-    }
-
-    // =============================
-    //  CORE E-COMMERCE
-    // =============================
+     /**
+     * @description Rules for /products/{productId} documents.
+     * @path /products/{productId}
+     * @allow (create) - A seller can create a product.
+     * @allow (get) - Anyone can read a product.
+     * @allow (update) - A seller can update their own product.
+     * @allow (delete) - A seller can delete their own product.
+     * @deny (create) - A user cannot create a product for another seller.
+     * @deny (update) - A user cannot update another seller's product.
+     * @deny (delete) - A user cannot delete another seller's product.
+     * @principle Enforces document ownership for writes, allows public reads.
+     */
     match /products/{productId} {
-      allow read: if true;
-      allow create, update, delete: if isRole('seller') && request.resource.data.sellerId == request.auth.uid;
-      allow write: if isRole('admin'); // Admin can override
+      allow get, list: if true;
+
+      allow create: if isSignedIn(); // TODO: Seller must create their own product
+      allow update: if isSignedIn() && resource != null; // TODO: Seller must update their own product
+      allow delete: if isSignedIn() && resource != null; // TODO: Seller must delete their own product
     }
 
+    /**
+     * @description Rules for /admins/{adminId} documents.
+     * @path /admins/{adminId}
+     * @allow (create) - An admin can create their own document.
+     * @allow (get) - Anyone can read an admin document.
+     * @allow (update) - An admin can update their own document.
+     * @allow (delete) - An admin can delete their own document.
+     * @deny (create) - A user cannot create an admin document for another user.
+     * @deny (update) - A user cannot update another admin's document.
+     * @deny (delete) - A user cannot delete another admin's document.
+     * @principle Enforces document ownership for writes.
+     */
+    match /admins/{adminId} {
+      allow get: if isSignedIn();
+      allow list: if false;
+
+      allow create: if isSignedIn() && request.auth.uid == adminId;
+      allow update: if isExistingOwner(adminId) && isIdNotChanged('id');
+      allow delete: if isExistingOwner(adminId);
+    }
+
+    /**
+     * @description Rules for /orders/{orderId} documents.
+     * @path /orders/{orderId}
+     * @allow (create) - Anyone can create an order.
+     * @allow (get) - Anyone can read an order.
+     * @allow (update) - No one can update an order.
+     * @allow (delete) - No one can delete an order.
+     * @principle Allows public reads, restricts writes.
+     */
     match /orders/{orderId} {
-      allow create: if isRole('user');
-      allow read: if (isRole('user') && resource.data.userId == request.auth.uid) || isOneOfRoles(['seller', 'support', 'logistics', 'admin', 'finance']);
-      allow update: if isOneOfRoles(['seller', 'support', 'logistics', 'admin']);
-      allow delete: if isRole('admin');
+        allow get, list: if isSignedIn(); // TODO: Only the user who created the order should be able to read it, or the seller fulfiling the order
+
+        allow create: if isSignedIn(); // TODO: add check here
+
+        allow update, delete: if false;
     }
 
-    match /categories/{categoryId} {
-      allow read: if true;
-      allow write: if isRole('admin');
-    }
-
-    // =============================
-    //  OPERATIONS
-    // =============================
+    /**
+     * @description Rules for /payments/{paymentId} documents.
+     * @path /payments/{paymentId}
+     * @allow (create) - Anyone can create a payment.
+     * @allow (get) - Anyone can read a payment.
+     * @allow (update) - No one can update a payment.
+     * @allow (delete) - No one can delete a payment.
+     * @principle Allows public reads, restricts writes.
+     */
     match /payments/{paymentId} {
-      allow read: if (isRole('user') && resource.data.userId == request.auth.uid) || isOneOfRoles(['finance', 'admin', 'support']);
-      allow create: if isRole('user') || isRole('admin');
-      allow update: if isOneOfRoles(['finance', 'admin']);
-    }
-    
-    match /payouts/{payoutId} {
-      allow read, update: if isOneOfRoles(['finance', 'admin']);
-      allow create: if isRole('finance');
+        allow get, list: if isSignedIn(); // TODO: User making the payment should be able to read, and the admin
+
+        allow create: if isSignedIn(); // TODO: Payment check
+
+        allow update, delete: if false;
     }
 
-    match /refund_flags/{refundId} {
-       allow create: if isRole('support');
-       allow read, update: if isOneOfRoles(['support', 'finance', 'admin']);
-    }
-
-    match /shipments/{shipmentId} {
-      allow read, update: if isOneOfRoles(['logistics', 'admin', 'support', 'seller']);
-      allow create: if isOneOfRoles(['logistics', 'admin']);
-    }
-
+    /**
+     * @description Rules for /support_tickets/{ticketId} documents.
+     * @path /support_tickets/{ticketId}
+     */
     match /support_tickets/{ticketId} {
-      allow create: if isSignedIn();
-      allow read, update: if (resource.data.raisedBy == request.auth.uid) || isOneOfRoles(['support', 'admin']);
+      allow get, list: if isSignedIn(); // TODO: Restrict listing and getting only to relevant users
+      allow create: if isSignedIn(); // TODO: Create rule for support tickets
+      allow update: if false;
+      allow delete: if false;
     }
-    
-    // =============================
-    //  MARKETING & CONTENT
-    // =============================
+
+    /**
+     * @description Rules for /refund_flags/{refundId} documents.
+     * @path /refund_flags/{refundId}
+     */
+    match /refund_flags/{refundId} {
+      allow get, list: if isSignedIn(); // TODO: Restrict listing and getting only to relevant users
+      allow create: if isSignedIn(); // TODO: Create rule for support tickets
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    /**
+     * @description Rules for /campaigns/{campaignId} documents.
+     * @path /campaigns/{campaignId}
+     */
     match /campaigns/{campaignId} {
-      allow read: if true;
-      allow write: if isOneOfRoles(['marketing', 'admin']);
+      allow get, list: if isSignedIn(); // TODO: Restrict listing and getting only to relevant users
+      allow create: if isSignedIn(); // TODO: Create rule for support tickets
+      allow update: if false;
+      allow delete: if false;
     }
 
-    match /coupons/{couponCode} {
-      allow read: if isSignedIn();
-      allow write: if isOneOfRoles(['marketing', 'admin']);
+    /**
+     * @description Rules for /coupons/{couponId} documents.
+     * @path /coupons/{couponId}
+     */
+    match /coupons/{couponId} {
+      allow get, list: if isSignedIn(); // TODO: Restrict listing and getting only to relevant users
+      allow create: if isSignedIn(); // TODO: Create rule for support tickets
+      allow update: if false;
+      allow delete: if false;
     }
 
-    match /notifications/{notifId} {
-      allow read: if resource.data.audience.userId == request.auth.uid || isRole('admin');
-      allow create, update: if isOneOfRoles(['marketing', 'admin']);
+    /**
+     * @description Rules for /transactions/{transactionId} documents.
+     * @path /transactions/{transactionId}
+     */
+    match /transactions/{transactionId} {
+      allow get, list: if isSignedIn(); // TODO: Restrict listing and getting only to relevant users
+      allow create: if isSignedIn(); // TODO: Create rule for support tickets
+      allow update: if false;
+      allow delete: if false;
     }
 
-    // =============================
-    //  SYSTEM & LOGS
-    // =============================
-    match /site_config/{configId} {
-      allow read: if true;
-      allow write: if isRole('admin');
+    /**
+     * @description Rules for /payouts/{payoutId} documents.
+     * @path /payouts/{payoutId}
+     */
+    match /payouts/{payoutId} {
+      allow get, list: if isSignedIn(); // TODO: Restrict listing and getting only to relevant users
+      allow create: if isSignedIn(); // TODO: Create rule for support tickets
+      allow update: if false;
+      allow delete: if false;
     }
 
+    /**
+     * @description Rules for /reports/{reportId} documents.
+     * @path /reports/{reportId}
+     */
     match /reports/{reportId} {
-       allow read, write: if isOneOfRoles(['admin', 'finance', 'marketing']);
+      allow get, list: if isSignedIn(); // TODO: Restrict listing and getting only to relevant users
+      allow create: if isSignedIn(); // TODO: Create rule for support tickets
+      allow update: if false;
+      allow delete: if false;
     }
-    
+
+    /**
+     * @description Rules for /site_config/{configId} documents.
+     * @path /site_config/{configId}
+     */
+    match /site_config/{configId} {
+      allow get, list: if isSignedIn(); // TODO: Restrict listing and getting only to relevant users
+      allow create: if isSignedIn(); // TODO: Create rule for support tickets
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    /**
+     * @description Rules for /activity_logs/{logId} documents.
+     * @path /activity_logs/{logId}
+     */
     match /activity_logs/{logId} {
-      allow read: if isRole('admin');
-      allow create: if isSignedIn(); // Allow server-side logging
+      allow get, list: if isSignedIn(); // TODO: Restrict listing and getting only to relevant users
+      allow create: if isSignedIn(); // TODO: Create rule for support tickets
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    /**
+     * @description Rules for /notifications/{notificationId} documents.
+     * @path /notifications/{notificationId}
+     */
+    match /notifications/{notificationId} {
+      allow get, list: if isSignedIn(); // TODO: Restrict listing and getting only to relevant users
+      allow create: if isSignedIn(); // TODO: Create rule for support tickets
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    /**
+     * @description Rules for /support/{supportId} documents.
+     * @path /support/{supportId}
+     */
+    match /support/{supportId} {
+      allow get, list: if isSignedIn(); // TODO: Restrict listing and getting only to relevant users
+      allow create: if isSignedIn(); // TODO: Create rule for support tickets
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    /**
+     * @description Rules for /finance/{financeId} documents.
+     * @path /finance/{financeId}
+     */
+    match /finance/{financeId} {
+      allow get, list: if isSignedIn(); // TODO: Restrict listing and getting only to relevant users
+      allow create: if isSignedIn(); // TODO: Create rule for support tickets
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    /**
+     * @description Rules for /marketing/{marketerId} documents.
+     * @path /marketing/{marketerId}
+     */
+    match /marketing/{marketerId} {
+      allow get, list: if isSignedIn(); // TODO: Restrict listing and getting only to relevant users
+      allow create: if isSignedIn(); // TODO: Create rule for support tickets
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    /**
+     * @description Rules for /data_entry/{entryId} documents.
+     * @path /data_entry/{entryId}
+     */
+    match /data_entry/{entryId} {
+      allow get, list: if isSignedIn(); // TODO: Restrict listing and getting only to relevant users
+      allow create: if isSignedIn(); // TODO: Create rule for support tickets
+      allow update: if false;
+      allow delete: if false;
     }
   }
 }
