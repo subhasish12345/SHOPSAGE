@@ -8,10 +8,10 @@ export default function Home() {
       <p className="mb-8">Your one-stop shop for everything.</p>
       <div className="space-x-4">
         <Button asChild>
-          <Link href="/login">Login</Link>
+          <Link href="/login">login</Link>
         </Button>
         <Button asChild variant="outline">
-          <Link href="/signup">Sign Up</Link>
+          <Link href="/signup">signup</Link>
         </Button>
       </div>
     </div>
