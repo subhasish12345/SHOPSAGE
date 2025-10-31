@@ -1,3 +1,148 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "banner-1",
+      "description": "A vibrant banner showing a festive sale with confetti and gift boxes.",
+      "imageUrl": "https://images.unsplash.com/photo-1647221598091-880219fa2c8f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxzYWxlJTIwcHJvbW90aW9ufGVufDB8fHx8MTc2MTg5MzU0M3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "sale promotion"
+    },
+    {
+      "id": "banner-2",
+      "description": "A stylish banner showcasing new clothing arrivals on models.",
+      "imageUrl": "https://images.unsplash.com/photo-1529720317453-c8da503f2051?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxmYXNoaW9uJTIwYXBwYXJlbHxlbnwwfHx8fDE3NjE4MjE4MDF8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "fashion apparel"
+    },
+    {
+      "id": "banner-3",
+      "description": "A sleek banner advertising the latest electronic gadgets like phones and laptops.",
+      "imageUrl": "https://images.unsplash.com/photo-1717295248521-4c1f2b6bcd6e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxlbGVjdHJvbmljJTIwZ2FkZ2V0c3xlbnwwfHx8fDE3NjE4NDY1NjV8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "electronic gadgets"
+    },
+    {
+      "id": "cat-mobiles",
+      "description": "Icon for mobile phones category.",
+      "imageUrl": "https://images.unsplash.com/photo-1596526131090-bcbe09e432d3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxzbWFydHBob25lJTIwaWNvbnxlbnwwfHx8fDE3NjE4OTkyNjR8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "smartphone icon"
+    },
+    {
+      "id": "cat-fashion",
+      "description": "Icon for fashion and apparel category.",
+      "imageUrl": "https://images.unsplash.com/photo-1760996608164-f61b51c34c36?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHx0LXNoaXJ0JTIwaWNvbnxlbnwwfHx8fDE3NjE4OTkyNjR8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "t-shirt icon"
+    },
+    {
+      "id": "cat-electronics",
+      "description": "Icon for electronics category.",
+      "imageUrl": "https://images.unsplash.com/photo-1594916973877-0ce410768437?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8aGVhZHBob25lcyUyMGljb258ZW58MHx8fHwxNzYxODIyOTM1fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "headphones icon"
+    },
+    {
+      "id": "cat-home",
+      "description": "Icon for home goods category.",
+      "imageUrl": "https://images.unsplash.com/photo-1652707976011-cbc549eb7ad5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxzb2ZhJTIwaWNvbnxlbnwwfHx8fDE3NjE4OTkyNjR8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "sofa icon"
+    },
+    {
+      "id": "cat-appliances",
+      "description": "Icon for home appliances category.",
+      "imageUrl": "https://images.unsplash.com/photo-1649105057951-e3006c21a664?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHx3YXNoaW5nJTIwbWFjaGluZXxlbnwwfHx8fDE3NjE4Njc4MDB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "washing machine"
+    },
+    {
+      "id": "cat-travel",
+      "description": "Icon for travel category.",
+      "imageUrl": "https://images.unsplash.com/photo-1576175161184-bb926de82d8c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxhaXJwbGFuZSUyMGljb258ZW58MHx8fHwxNzYxODk5MjY0fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "airplane icon"
+    },
+    {
+      "id": "cat-toys",
+      "description": "Icon for toys and games category.",
+      "imageUrl": "https://images.unsplash.com/photo-1581312742770-ce89199554af?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHx0ZWRkeSUyMGJlYXJ8ZW58MHx8fHwxNzYxODk5MjY0fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "teddy bear"
+    },
+    {
+      "id": "cat-grocery",
+      "description": "Icon for grocery category.",
+      "imageUrl": "https://images.unsplash.com/photo-1568702846914-96b305d2aaeb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8YXBwbGUlMjBmcnVpdHxlbnwwfHx8fDE3NjE4NzE4NzV8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "apple fruit"
+    },
+    {
+      "id": "product-1",
+      "description": "A modern smartphone with a sleek design.",
+      "imageUrl": "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxzbWFydHBob25lfGVufDB8fHx8MTc2MTgyMjQ5Mnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "smartphone"
+    },
+    {
+      "id": "product-2",
+      "description": "A stylish vintage brown leather jacket.",
+      "imageUrl": "https://images.unsplash.com/photo-1727524366429-27de8607d5f6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxsZWF0aGVyJTIwamFja2V0fGVufDB8fHx8MTc2MTgxMjAwNnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "leather jacket"
+    },
+    {
+      "id": "product-3",
+      "description": "A large 4K Ultra HD Smart TV.",
+      "imageUrl": "https://images.unsplash.com/photo-1615986200762-a1ed9610d3b1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxzbWFydCUyMHR2fGVufDB8fHx8MTc2MTgxNzE5OXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "smart tv"
+    },
+    {
+      "id": "product-4",
+      "description": "A black ergonomic office chair.",
+      "imageUrl": "https://images.unsplash.com/photo-1688578735427-994ecdea3ea4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxvZmZpY2UlMjBjaGFpcnxlbnwwfHx8fDE3NjE4MDYwMjd8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "office chair"
+    },
+    {
+      "id": "product-5",
+      "description": "A smart coffee maker with a glass carafe.",
+      "imageUrl": "https://images.unsplash.com/photo-1593369196682-6d8ec9ff3ae0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxjb2ZmZWUlMjBtYWtlcnxlbnwwfHx8fDE3NjE4MjY4NTl8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "coffee maker"
+    },
+    {
+      "id": "product-6",
+      "description": "A lightweight and durable travel backpack.",
+      "imageUrl": "https://images.unsplash.com/photo-1689828615239-8310767d670b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8dHJhdmVsJTIwYmFja3BhY2t8ZW58MHx8fHwxNzYxODkxNzQ4fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "travel backpack"
+    },
+    {
+      "id": "product-7",
+      "description": "A set of colorful wooden building blocks for kids.",
+      "imageUrl": "https://images.unsplash.com/photo-1539477192933-1a7dde04aa77?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxidWlsZGluZyUyMGJsb2Nrc3xlbnwwfHx8fDE3NjE4NTEzMzF8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "building blocks"
+    },
+    {
+      "id": "product-8",
+      "description": "A bag of organic quinoa grains.",
+      "imageUrl": "https://images.unsplash.com/photo-1542838132-92c53300491e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxvcmdhbmljJTIwZm9vZHxlbnwwfHx8fDE3NjE3OTI1OTl8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "organic food"
+    },
+    {
+      "id": "product-9",
+      "description": "A pair of sleek wireless noise-cancelling headphones.",
+      "imageUrl": "https://images.unsplash.com/photo-1612465289702-7c84b5258fde?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHx3aXJlbGVzcyUyMGhlYWRwaG9uZXN8ZW58MHx8fHwxNzYxODg4MTAyfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "wireless headphones"
+    },
+    {
+      "id": "product-10",
+      "description": "A pair of men's running shoes in a dynamic pose.",
+      "imageUrl": "https://images.unsplash.com/photo-1585944672394-4c58a015c1fb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxydW5uaW5nJTIwc2hvZXN8ZW58MHx8fHwxNzYxODYyNTM4fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "running shoes"
+    },
+    {
+      "id": "product-11",
+      "description": "A robotic vacuum cleaner moving across a wooden floor.",
+      "imageUrl": "https://images.unsplash.com/photo-1634793350906-63567e86df97?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxyb2JvdGljJTIwdmFjdXVtfGVufDB8fHx8MTc2MTg5OTI2NHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "robotic vacuum"
+    },
+    {
+      "id": "product-12",
+      "description": "A digital art tablet with a stylus.",
+      "imageUrl": "https://images.unsplash.com/photo-1671087709820-274fdd9ac67a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxhcnQlMjB0YWJsZXR8ZW58MHx8fHwxNzYxODk5MjY0fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "art tablet"
+    },
+    {
+      "id": "user-avatar",
+      "description": "A placeholder for a user's avatar image.",
+      "imageUrl": "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHx1c2VyJTIwYXZhdGFyfGVufDB8fHx8MTc2MTg4NjMzNnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "user avatar"
+    }
+  ]
 }

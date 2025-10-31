@@ -1,0 +1,150 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // =============================
+    //  GLOBAL HELPERS
+    // =============================
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isRole(role) {
+      return isSignedIn() && request.auth.token.role == role;
+    }
+    
+    function isOneOfRoles(roles) {
+      return isSignedIn() && request.auth.token.role in roles;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // =============================
+    //  ROLES & USERS
+    // =============================
+    match /users/{userId} {
+      allow read, update: if isOwner(userId) || isRole('admin');
+      allow create: if true;
+      allow delete: if isRole('admin');
+      
+      // Subcollections like cart, wishlist
+      match /{subcollection}/{docId} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+    
+    match /sellers/{sellerId} {
+      allow get: if true; // Public can view seller info
+      allow list: if isSignedIn();
+      allow update: if (isRole('seller') && isOwner(sellerId)) || isRole('admin');
+      allow create, delete: if isRole('admin');
+    }
+    
+    match /admins/{adminId} {
+      allow read, write: if isRole('admin');
+    }
+
+    match /support_agents/{agentId} {
+      allow read, write: if isRole('admin');
+    }
+
+    match /finance_agents/{agentId} {
+      allow read, write: if isRole('admin');
+    }
+    
+    match /marketing_agents/{agentId} {
+      allow read, write: if isRole('admin');
+    }
+
+    match /delivery_agents/{agentId} {
+      allow read, write: if isRole('admin') || isRole('logistics');
+    }
+
+    // =============================
+    //  CORE E-COMMERCE
+    // =============================
+    match /products/{productId} {
+      allow read: if true;
+      allow create, update, delete: if isRole('seller') && request.resource.data.sellerId == request.auth.uid;
+      allow write: if isRole('admin'); // Admin can override
+    }
+
+    match /orders/{orderId} {
+      allow create: if isRole('user');
+      allow read: if (isRole('user') && resource.data.userId == request.auth.uid) || isOneOfRoles(['seller', 'support', 'logistics', 'admin', 'finance']);
+      allow update: if isOneOfRoles(['seller', 'support', 'logistics', 'admin']);
+      allow delete: if isRole('admin');
+    }
+
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow write: if isRole('admin');
+    }
+
+    // =============================
+    //  OPERATIONS
+    // =============================
+    match /payments/{paymentId} {
+      allow read: if (isRole('user') && resource.data.userId == request.auth.uid) || isOneOfRoles(['finance', 'admin', 'support']);
+      allow create: if isRole('user') || isRole('admin');
+      allow update: if isOneOfRoles(['finance', 'admin']);
+    }
+    
+    match /payouts/{payoutId} {
+      allow read, update: if isOneOfRoles(['finance', 'admin']);
+      allow create: if isRole('finance');
+    }
+
+    match /refund_flags/{refundId} {
+       allow create: if isRole('support');
+       allow read, update: if isOneOfRoles(['support', 'finance', 'admin']);
+    }
+
+    match /shipments/{shipmentId} {
+      allow read, update: if isOneOfRoles(['logistics', 'admin', 'support', 'seller']);
+      allow create: if isOneOfRoles(['logistics', 'admin']);
+    }
+
+    match /support_tickets/{ticketId} {
+      allow create: if isSignedIn();
+      allow read, update: if (resource.data.raisedBy == request.auth.uid) || isOneOfRoles(['support', 'admin']);
+    }
+    
+    // =============================
+    //  MARKETING & CONTENT
+    // =============================
+    match /campaigns/{campaignId} {
+      allow read: if true;
+      allow write: if isOneOfRoles(['marketing', 'admin']);
+    }
+
+    match /coupons/{couponCode} {
+      allow read: if isSignedIn();
+      allow write: if isOneOfRoles(['marketing', 'admin']);
+    }
+
+    match /notifications/{notifId} {
+      allow read: if resource.data.audience.userId == request.auth.uid || isRole('admin');
+      allow create, update: if isOneOfRoles(['marketing', 'admin']);
+    }
+
+    // =============================
+    //  SYSTEM & LOGS
+    // =============================
+    match /site_config/{configId} {
+      allow read: if true;
+      allow write: if isRole('admin');
+    }
+
+    match /reports/{reportId} {
+       allow read, write: if isOneOfRoles(['admin', 'finance', 'marketing']);
+    }
+    
+    match /activity_logs/{logId} {
+      allow read: if isRole('admin');
+      allow create: if isSignedIn(); // Allow server-side logging
+    }
+  }
+}
