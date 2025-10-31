@@ -17,7 +17,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import Link from 'next/link';
 import { useAuth, useUser } from '@/firebase';
 import { initiateEmailSignUp } from '@/firebase/non-blocking-login';
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithRedirect } from 'firebase/auth';
 import { Chrome, Loader2 } from 'lucide-react';
 import Logo from '@/components/logo';
 import { useEffect } from 'react';
@@ -61,14 +61,10 @@ export default function SignUpPage() {
     initiateEmailSignUp(auth, values.email, values.password);
   }
 
-  const handleGoogleSignIn = async () => {
+  const handleGoogleSignIn = () => {
     if (!auth) return;
     const provider = new GoogleAuthProvider();
-    try {
-      await signInWithPopup(auth, provider);
-    } catch (error) {
-      console.error('Error during Google sign-in:', error);
-    }
+    signInWithRedirect(auth, provider);
   };
 
   if (isUserLoading || user) {

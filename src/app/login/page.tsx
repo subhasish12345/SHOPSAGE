@@ -18,7 +18,7 @@ import Link from 'next/link';
 import { useAuth, useUser } from '@/firebase';
 import {
   GoogleAuthProvider,
-  signInWithPopup,
+  signInWithRedirect,
 } from 'firebase/auth';
 import { initiateEmailSignIn } from '@/firebase/non-blocking-login';
 import { Chrome, Loader2, Phone } from 'lucide-react';
@@ -57,14 +57,10 @@ export default function LoginPage() {
     initiateEmailSignIn(auth, values.emailOrPhone, values.password);
   }
 
-  const handleGoogleSignIn = async () => {
+  const handleGoogleSignIn = () => {
     if (!auth) return;
     const provider = new GoogleAuthProvider();
-    try {
-      await signInWithPopup(auth, provider);
-    } catch (error) {
-      console.error('Error during Google sign-in:', error);
-    }
+    signInWithRedirect(auth, provider);
   };
 
   if (isUserLoading || user) {
