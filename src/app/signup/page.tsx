@@ -22,6 +22,7 @@ import { Chrome, Loader2 } from 'lucide-react';
 import Logo from '@/components/logo';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useToast } from '@/hooks/use-toast';
 
 const formSchema = z.object({
   fullName: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
@@ -38,6 +39,7 @@ export default function SignUpPage() {
   const auth = useAuth();
   const { user, isUserLoading } = useUser();
   const router = useRouter();
+  const { toast } = useToast();
 
   useEffect(() => {
     if (user) {
@@ -68,7 +70,11 @@ export default function SignUpPage() {
       await signInWithPopup(auth, provider);
     } catch (error) {
       if ((error as AuthError).code === 'auth/popup-blocked') {
-        alert('Popup blocked! Please allow popups for this site to sign in with Google.');
+        toast({
+          title: 'Popup Blocked',
+          description: 'Please allow popups for this site to sign in with Google.',
+          variant: 'destructive',
+        });
       }
       console.error('Error during Google sign-in:', error);
     }
