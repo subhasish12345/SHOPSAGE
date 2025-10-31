@@ -3,6 +3,7 @@ import './globals.css';
 import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/toaster';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
+import './animated-background.css';
 
 export const metadata: Metadata = {
   title: 'ShopSage - Your Complete E-commerce Destination',

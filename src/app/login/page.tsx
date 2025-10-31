@@ -94,11 +94,10 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen w-full lg:grid lg:grid-cols-2">
-      <div className="relative hidden lg:flex flex-col items-center justify-center bg-gradient-to-br from-primary to-accent p-12 text-primary-foreground">
-         <div className="absolute inset-0 bg-primary/80" />
+      <div className="relative hidden lg:flex flex-col items-center justify-center p-12 text-primary-foreground animated-gradient">
          <div className="relative z-10 text-center">
-            <h1 className="text-4xl font-bold tracking-tight font-headline">Welcome back to ShopSage</h1>
-            <p className="mt-4 text-lg text-primary-foreground/80">Grow Smarter, Sell Faster.</p>
+            <h1 className="text-4xl font-bold tracking-tight font-headline text-slate-800">Welcome back to ShopSage</h1>
+            <p className="mt-4 text-lg text-slate-700/80">Grow Smarter, Sell Faster.</p>
          </div>
       </div>
       <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-background">
