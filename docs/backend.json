@@ -207,7 +207,8 @@
   "auth": {
     "providers": [
       "password",
-      "anonymous"
+      "google.com",
+      "phone"
     ]
   },
   "firestore": {
@@ -556,3 +557,4 @@
     "reasoning": "The Firestore data structure is designed to support a multi-role e-commerce platform, ShopSage, with clear separation of concerns and role-based access control. Authorization Independence is achieved by using path-based ownership for user-specific data (e.g., /users/{userId}/cart/{itemId}) and denormalizing authorization context where necessary, such as including sellerId in the products collection to allow sellers to manage only their products. The use of subcollections for cart, wishlist, and orders addresses the scalability concerns of large arrays inside documents. Segregation is achieved by dedicating collections to different roles (admins, sellers, support, etc.), ensuring that documents within a collection share the same security requirements, which helps to avoid complex rule logic. QAPs are supported via this segregation, with each collection having clear rules about who can list and what constraints apply to such lists."
   }
 }
+    
