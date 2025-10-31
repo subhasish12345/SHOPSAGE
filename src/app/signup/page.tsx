@@ -105,17 +105,17 @@ export default function SignUpPage() {
             <p className="mt-4 text-lg text-primary-foreground/80">Join as a User today. You can apply to become a Seller anytime.</p>
          </div>
       </div>
-      <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-background">
-        <div className="w-full max-w-md space-y-6">
+      <div className="flex items-center justify-center py-6 px-4 sm:px-6 lg:px-8 bg-background">
+        <div className="w-full max-w-md space-y-4">
           <div className="flex justify-center w-full lg:hidden">
               <Logo />
           </div>
           <Card className="shadow-2xl rounded-2xl w-full">
             <CardHeader className="text-center">
-              <CardTitle className="text-3xl font-bold tracking-tight font-headline">Sign Up</CardTitle>
+              <CardTitle className="text-2xl font-bold tracking-tight font-headline">Sign Up</CardTitle>
               <CardDescription>Create your account to get started.</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-4">
               {popupError && (
                 <Alert variant="destructive" className="mb-4">
                   <AlertCircle className="h-4 w-4" />
@@ -126,7 +126,7 @@ export default function SignUpPage() {
                 </Alert>
               )}
               <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
                   <FormField
                     control={form.control}
                     name="fullName"
@@ -134,7 +134,7 @@ export default function SignUpPage() {
                       <FormItem>
                         <FormLabel>Full Name</FormLabel>
                         <FormControl>
-                          <Input placeholder="John Doe" {...field} className="h-12 focus:border-primary focus:shadow-sm" />
+                          <Input placeholder="John Doe" {...field} className="h-10 focus:border-primary focus:shadow-sm" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -147,7 +147,7 @@ export default function SignUpPage() {
                       <FormItem>
                         <FormLabel>Email</FormLabel>
                         <FormControl>
-                          <Input placeholder="you@example.com" {...field} className="h-12 focus:border-primary focus:shadow-sm" />
+                          <Input placeholder="you@example.com" {...field} className="h-10 focus:border-primary focus:shadow-sm" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -160,7 +160,7 @@ export default function SignUpPage() {
                       <FormItem>
                         <FormLabel>Phone Number</FormLabel>
                         <FormControl>
-                          <Input placeholder="+1 234 567 890" {...field} className="h-12 focus:border-primary focus:shadow-sm" />
+                          <Input placeholder="+1 234 567 890" {...field} className="h-10 focus:border-primary focus:shadow-sm" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -173,7 +173,7 @@ export default function SignUpPage() {
                       <FormItem>
                         <FormLabel>Password</FormLabel>
                         <FormControl>
-                          <Input type="password" placeholder="••••••••" {...field} className="h-12 focus:border-primary focus:shadow-sm" />
+                          <Input type="password" placeholder="••••••••" {...field} className="h-10 focus:border-primary focus:shadow-sm" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -186,18 +186,18 @@ export default function SignUpPage() {
                       <FormItem>
                         <FormLabel>Confirm Password</FormLabel>
                         <FormControl>
-                          <Input type="password" placeholder="••••••••" {...field} className="h-12 focus:border-primary focus:shadow-sm" />
+                          <Input type="password" placeholder="••••••••" {...field} className="h-10 focus:border-primary focus:shadow-sm" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                  <Button type="submit" className="w-full !mt-6 h-12 text-base font-semibold hover:scale-[1.03] transition-transform hover:shadow-primary-50 shadow-lg">
+                  <Button type="submit" className="w-full !mt-4 h-10 text-base font-semibold hover:scale-[1.03] transition-transform hover:shadow-primary-50 shadow-lg">
                     Sign Up
                   </Button>
                 </form>
               </Form>
-              <div className="relative my-6">
+              <div className="relative my-4">
                 <div className="absolute inset-0 flex items-center">
                   <span className="w-full border-t" />
                 </div>
@@ -207,14 +207,14 @@ export default function SignUpPage() {
                   </span>
                 </div>
               </div>
-              <Button variant="outline" className="w-full h-12 text-base" onClick={handleGoogleSignIn}>
+              <Button variant="outline" className="w-full h-10 text-base" onClick={handleGoogleSignIn}>
                 <Chrome className="mr-2 h-5 w-5" />
                 Sign up with Google
               </Button>
                <p className="mt-4 px-8 text-center text-xs text-muted-foreground">
                 By signing up, you agree to ShopSage Terms of Service.
               </p>
-              <p className="mt-6 text-center text-sm text-muted-foreground">
+              <p className="mt-4 text-center text-sm text-muted-foreground">
                 Already have an account?{' '}
                 <Link href="/login" className="font-semibold text-primary hover:underline">
                   Login
