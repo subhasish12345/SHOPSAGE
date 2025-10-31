@@ -3,6 +3,8 @@
 import { useEffect } from 'react';
 import { useUser, useFirestore } from '@/firebase';
 import { doc, getDoc, setDoc, serverTimestamp, collection, query, where, getDocs } from 'firebase/firestore';
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError } from '@/firebase/errors';
 
 /**
  * A hook that automatically creates a user document in Firestore if one doesn't already exist.
@@ -13,14 +15,14 @@ export function useCreateUser() {
   const firestore = useFirestore();
 
   useEffect(() => {
-    if (!user || isUserLoading) {
+    if (!user || isUserLoading || !firestore) {
       return;
     }
 
     const createUserDocument = async () => {
       if (!firestore) return;
       const userRef = doc(firestore, 'users', user.uid);
-      
+
       try {
         const userDoc = await getDoc(userRef);
         
@@ -48,10 +50,18 @@ export function useCreateUser() {
             updatedAt: serverTimestamp(),
           };
           
-          await setDoc(userRef, newUser);
+          setDoc(userRef, newUser).catch(error => {
+            const permissionError = new FirestorePermissionError({
+                path: userRef.path,
+                operation: 'create',
+                requestResourceData: newUser
+            });
+            errorEmitter.emit('permission-error', permissionError);
+          });
         }
       } catch (error) {
-        console.error("Error creating user document:", error);
+        // This will catch errors from getDoc or getDocs, which we can handle generically for now.
+        console.error("Error checking or creating user document:", error);
       }
     };
 
