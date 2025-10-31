@@ -29,6 +29,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import FloatingShapes from '@/components/floating-shapes';
 
 
 const formSchema = z.object({
@@ -117,7 +118,8 @@ export default function SignUpPage() {
 
   return (
     <div className="min-h-screen w-full lg:grid lg:grid-cols-2">
-       <div className="relative hidden lg:flex flex-col items-center justify-center p-12 text-primary-foreground animated-gradient">
+       <div className="relative hidden lg:flex flex-col items-center justify-center p-12 bg-muted overflow-hidden">
+         <FloatingShapes />
          <div className="relative z-10 text-center">
             <h1 className="text-4xl font-bold tracking-tight font-headline text-slate-800">Create Your ShopSage Account</h1>
             <p className="mt-4 text-lg text-slate-700/80">Join as a User today. You can apply to become a Seller anytime.</p>
