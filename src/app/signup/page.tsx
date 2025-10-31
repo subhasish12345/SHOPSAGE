@@ -17,7 +17,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import Link from 'next/link';
 import { useAuth, useUser } from '@/firebase';
 import { initiateEmailSignUp } from '@/firebase/non-blocking-login';
-import { GoogleAuthProvider, signInWithRedirect } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { Chrome, Loader2 } from 'lucide-react';
 import Logo from '@/components/logo';
 import { useEffect } from 'react';
@@ -61,10 +61,14 @@ export default function SignUpPage() {
     initiateEmailSignUp(auth, values.email, values.password);
   }
 
-  const handleGoogleSignIn = () => {
+  const handleGoogleSignIn = async () => {
     if (!auth) return;
     const provider = new GoogleAuthProvider();
-    signInWithRedirect(auth, provider);
+    try {
+      await signInWithPopup(auth, provider);
+    } catch (error) {
+      console.error('Error during Google sign-in:', error);
+    }
   };
 
   if (isUserLoading || user) {
@@ -162,7 +166,7 @@ export default function SignUpPage() {
                       </FormItem>
                     )}
                   />
-                  <Button type="submit" className="w-full !mt-6 h-12 text-base font-semibold hover:scale-[1.03] transition-transform hover:shadow-primary/50 shadow-lg">
+                  <Button type="submit" className="w-full !mt-6 h-12 text-base font-semibold hover:scale-[1.03] transition-transform hover:shadow-primary-50 shadow-lg">
                     Sign Up
                   </Button>
                 </form>
