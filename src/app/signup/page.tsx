@@ -17,7 +17,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import Link from 'next/link';
 import { useAuth, useUser } from '@/firebase';
 import { initiateEmailSignUp } from '@/firebase/non-blocking-login';
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithPopup, AuthError } from 'firebase/auth';
 import { Chrome, Loader2 } from 'lucide-react';
 import Logo from '@/components/logo';
 import { useEffect } from 'react';
@@ -67,6 +67,9 @@ export default function SignUpPage() {
     try {
       await signInWithPopup(auth, provider);
     } catch (error) {
+      if ((error as AuthError).code === 'auth/popup-blocked') {
+        alert('Popup blocked! Please allow popups for this site to sign in with Google.');
+      }
       console.error('Error during Google sign-in:', error);
     }
   };

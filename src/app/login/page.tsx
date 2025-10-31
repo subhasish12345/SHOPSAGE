@@ -19,6 +19,7 @@ import { useAuth, useUser } from '@/firebase';
 import {
   GoogleAuthProvider,
   signInWithPopup,
+  AuthError,
 } from 'firebase/auth';
 import { initiateEmailSignIn } from '@/firebase/non-blocking-login';
 import { Chrome, Loader2, Phone } from 'lucide-react';
@@ -63,6 +64,9 @@ export default function LoginPage() {
     try {
       await signInWithPopup(auth, provider);
     } catch (error) {
+      if ((error as AuthError).code === 'auth/popup-blocked') {
+        alert('Popup blocked! Please allow popups for this site to sign in with Google.');
+      }
       console.error('Error during Google sign-in:', error);
     }
   };
