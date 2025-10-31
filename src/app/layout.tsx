@@ -6,6 +6,7 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { SiteSidebar } from '@/components/site-sidebar';
+import { FirebaseClientProvider } from '@/firebase';
 
 export const metadata: Metadata = {
   title: 'ShopSage - Your Complete E-commerce Destination',
@@ -29,15 +30,17 @@ export default function RootLayout({
           'min-h-screen bg-background font-body antialiased'
         )}
       >
-        <SidebarProvider>
-          <div className="relative flex min-h-screen flex-col">
-            <Header />
-            <SiteSidebar />
-            <main className="flex-1">{children}</main>
-            <Footer />
-          </div>
-          <Toaster />
-        </SidebarProvider>
+        <FirebaseClientProvider>
+          <SidebarProvider>
+            <div className="relative flex min-h-screen flex-col">
+              <Header />
+              <SiteSidebar />
+              <main className="flex-1">{children}</main>
+              <Footer />
+            </div>
+            <Toaster />
+          </SidebarProvider>
+        </FirebaseClientProvider>
       </body>
     </html>
   );
