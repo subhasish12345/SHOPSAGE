@@ -2,11 +2,6 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/toaster';
-import { SidebarProvider } from '@/components/ui/sidebar';
-import Header from '@/components/layout/header';
-import Footer from '@/components/layout/footer';
-import { SiteSidebar } from '@/components/site-sidebar';
-import { FirebaseClientProvider } from '@/firebase';
 
 export const metadata: Metadata = {
   title: 'ShopSage - Your Complete E-commerce Destination',
@@ -30,12 +25,8 @@ export default function RootLayout({
           'min-h-screen bg-background font-body antialiased',
         )}
       >
-        <FirebaseClientProvider>
-          <SidebarProvider>
-            {children}
-            <Toaster />
-          </SidebarProvider>
-        </FirebaseClientProvider>
+        {children}
+        <Toaster />
       </body>
     </html>
   );

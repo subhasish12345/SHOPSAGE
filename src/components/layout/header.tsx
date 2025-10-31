@@ -58,6 +58,11 @@ export default function Header() {
                 <ShoppingCart className="mr-2 h-5 w-5" /> Cart
               </Link>
             </Button>
+            <Button variant="ghost" asChild>
+              <Link href="/login">
+                Login
+              </Link>
+            </Button>
           </div>
         </div>
       </div>

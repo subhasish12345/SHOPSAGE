@@ -56,28 +56,27 @@ export default function SignUpPage() {
     const provider = new GoogleAuthProvider();
     try {
       await signInWithPopup(auth, provider);
-    } catch (error) {
-      console.error('Error during Google sign-in:', error);
+    } catch (error)      console.error('Error during Google sign-in:', error);
     }
   };
 
   return (
     <div className="min-h-screen w-full lg:grid lg:grid-cols-2">
-      <div className="relative hidden lg:flex flex-col items-center justify-center bg-gradient-to-br from-primary to-accent p-12 text-primary-foreground">
+       <div className="relative hidden lg:flex flex-col items-center justify-center bg-gradient-to-br from-primary to-accent p-12 text-primary-foreground">
          <div className="absolute inset-0 bg-primary/80" />
          <div className="relative z-10 text-center">
-            <h1 className="text-4xl font-bold tracking-tight">Create Your ShopSage Account</h1>
+            <h1 className="text-4xl font-bold tracking-tight font-headline">Create Your ShopSage Account</h1>
             <p className="mt-4 text-lg text-primary-foreground/80">Join as a User today. You can apply to become a Seller anytime.</p>
          </div>
       </div>
       <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-background">
         <div className="w-full max-w-md space-y-8">
-            <div className="flex justify-start w-full">
-                <Logo />
-            </div>
+          <div className="flex justify-center w-full">
+              <Logo />
+          </div>
           <Card className="shadow-2xl rounded-2xl">
             <CardHeader className="text-center">
-              <CardTitle className="text-3xl font-bold tracking-tight">Sign Up</CardTitle>
+              <CardTitle className="text-3xl font-bold tracking-tight font-headline">Sign Up</CardTitle>
               <CardDescription>Create your account to get started.</CardDescription>
             </CardHeader>
             <CardContent>
@@ -90,7 +89,7 @@ export default function SignUpPage() {
                       <FormItem>
                         <FormLabel>Full Name</FormLabel>
                         <FormControl>
-                          <Input placeholder="John Doe" {...field} />
+                          <Input placeholder="John Doe" {...field} className="h-12 focus:border-primary focus:shadow-sm" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -103,7 +102,7 @@ export default function SignUpPage() {
                       <FormItem>
                         <FormLabel>Email</FormLabel>
                         <FormControl>
-                          <Input placeholder="you@example.com" {...field} />
+                          <Input placeholder="you@example.com" {...field} className="h-12 focus:border-primary focus:shadow-sm" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -116,7 +115,7 @@ export default function SignUpPage() {
                       <FormItem>
                         <FormLabel>Phone Number</FormLabel>
                         <FormControl>
-                          <Input placeholder="+1 234 567 890" {...field} />
+                          <Input placeholder="+1 234 567 890" {...field} className="h-12 focus:border-primary focus:shadow-sm" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -129,7 +128,7 @@ export default function SignUpPage() {
                       <FormItem>
                         <FormLabel>Password</FormLabel>
                         <FormControl>
-                          <Input type="password" placeholder="••••••••" {...field} />
+                          <Input type="password" placeholder="••••••••" {...field} className="h-12 focus:border-primary focus:shadow-sm" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -142,7 +141,7 @@ export default function SignUpPage() {
                       <FormItem>
                         <FormLabel>Confirm Password</FormLabel>
                         <FormControl>
-                          <Input type="password" placeholder="••••••••" {...field} />
+                          <Input type="password" placeholder="••••••••" {...field} className="h-12 focus:border-primary focus:shadow-sm" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -163,7 +162,7 @@ export default function SignUpPage() {
                   </span>
                 </div>
               </div>
-              <Button variant="outline" className="w-full h-12" onClick={handleGoogleSignIn}>
+              <Button variant="outline" className="w-full h-12 text-base" onClick={handleGoogleSignIn}>
                 <Chrome className="mr-2 h-5 w-5" />
                 Sign up with Google
               </Button>

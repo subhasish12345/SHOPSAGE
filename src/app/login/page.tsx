@@ -19,8 +19,6 @@ import { useAuth } from '@/firebase';
 import {
   GoogleAuthProvider,
   signInWithPopup,
-  PhoneAuthProvider,
-  signInWithPhoneNumber,
 } from 'firebase/auth';
 import { initiateEmailSignIn } from '@/firebase/non-blocking-login';
 import { Chrome, Phone } from 'lucide-react';
@@ -63,18 +61,18 @@ export default function LoginPage() {
       <div className="relative hidden lg:flex flex-col items-center justify-center bg-gradient-to-br from-primary to-accent p-12 text-primary-foreground">
          <div className="absolute inset-0 bg-primary/80" />
          <div className="relative z-10 text-center">
-            <h1 className="text-4xl font-bold tracking-tight">Welcome back to ShopSage</h1>
+            <h1 className="text-4xl font-bold tracking-tight font-headline">Welcome back to ShopSage</h1>
             <p className="mt-4 text-lg text-primary-foreground/80">Grow Smarter, Sell Faster.</p>
          </div>
       </div>
       <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-background">
         <div className="w-full max-w-md space-y-8">
-            <div className="flex justify-start w-full">
-                <Logo />
-            </div>
+          <div className="flex justify-center w-full">
+              <Logo />
+          </div>
           <Card className="shadow-2xl rounded-2xl">
             <CardHeader className="text-center">
-              <CardTitle className="text-3xl font-bold tracking-tight">Login</CardTitle>
+              <CardTitle className="text-3xl font-bold tracking-tight font-headline">Login</CardTitle>
               <CardDescription>Enter your credentials to access your account</CardDescription>
             </CardHeader>
             <CardContent>
@@ -87,7 +85,7 @@ export default function LoginPage() {
                       <FormItem>
                         <FormLabel>Email / Phone</FormLabel>
                         <FormControl>
-                          <Input placeholder="you@example.com" {...field} />
+                          <Input placeholder="you@example.com" {...field} className="h-12 focus:border-primary focus:shadow-sm" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -105,7 +103,7 @@ export default function LoginPage() {
                             </Link>
                         </div>
                         <FormControl>
-                          <Input type="password" placeholder="••••••••" {...field} />
+                          <Input type="password" placeholder="••••••••" {...field} className="h-12 focus:border-primary focus:shadow-sm" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -127,11 +125,11 @@ export default function LoginPage() {
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                  <Button variant="outline" className="h-12" onClick={handleGoogleSignIn}>
+                  <Button variant="outline" className="h-12 text-base" onClick={handleGoogleSignIn}>
                     <Chrome className="mr-2 h-5 w-5" />
                     Google
                   </Button>
-                  <Button variant="outline" className="h-12">
+                  <Button variant="outline" className="h-12 text-base">
                     <Phone className="mr-2 h-5 w-5" />
                     Phone
                   </Button>
