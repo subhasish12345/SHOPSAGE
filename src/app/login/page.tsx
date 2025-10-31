@@ -28,6 +28,8 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { signInWithPhoneNumber } from 'firebase/auth';
+import { setupRecaptcha } from '@/firebase/auth/phone-auth';
 
 const formSchema = z.object({
   emailOrPhone: z.string().min(1, { message: 'Email or Phone is required.' }),
@@ -60,9 +62,33 @@ export default function LoginPage() {
   function onSubmit(values: z.infer<typeof formSchema>) {
     if (!auth) return;
     setPopupError(null);
-    // For simplicity, we'll assume email for now. Phone logic can be added.
     initiateEmailSignIn(auth, values.emailOrPhone, values.password);
   }
+
+  const handlePhoneSignIn = async () => {
+    if (!auth) return;
+    const phoneNumber = prompt("Please enter your phone number with country code (e.g., +1234567890)");
+    if (!phoneNumber) return;
+
+    try {
+        const appVerifier = await setupRecaptcha('phone-signin-button');
+        const confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, appVerifier);
+        
+        const verificationCode = prompt("Please enter the verification code sent to your phone.");
+        if (verificationCode) {
+            await confirmationResult.confirm(verificationCode);
+            // User is signed in. The useUser hook will handle redirection.
+        }
+    } catch (error) {
+        console.error("Error during phone sign-in:", error);
+        toast({
+            title: 'Phone Sign-in Error',
+            description: 'Could not sign in with phone. Please check the number and try again.',
+            variant: 'destructive',
+        });
+    }
+  };
+
 
   const handleGoogleSignIn = async () => {
     if (!auth) return;
@@ -128,7 +154,7 @@ export default function LoginPage() {
                     name="emailOrPhone"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Email / Phone</FormLabel>
+                        <FormLabel>Email</FormLabel>
                         <FormControl>
                           <Input placeholder="you@example.com" {...field} className="h-12 focus:border-primary focus:shadow-sm" />
                         </FormControl>
@@ -174,7 +200,7 @@ export default function LoginPage() {
                     <Chrome className="mr-2 h-5 w-5" />
                     Google
                   </Button>
-                  <Button variant="outline" className="h-12 text-base">
+                  <Button id="phone-signin-button" variant="outline" className="h-12 text-base" onClick={handlePhoneSignIn}>
                     <Phone className="mr-2 h-5 w-5" />
                     Phone
                   </Button>

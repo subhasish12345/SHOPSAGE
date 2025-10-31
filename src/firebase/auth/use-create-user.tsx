@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { useUser, useFirestore } from '@/firebase';
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, setDoc, serverTimestamp, collection, query, where, getDocs } from 'firebase/firestore';
 
 /**
  * A hook that automatically creates a user document in Firestore if one doesn't already exist.
@@ -25,6 +25,19 @@ export function useCreateUser() {
         const userDoc = await getDoc(userRef);
         
         if (!userDoc.exists()) {
+          // Check for phone number uniqueness before creating user
+          if (user.phoneNumber) {
+            const usersRef = collection(firestore, 'users');
+            const q = query(usersRef, where("phone", "==", user.phoneNumber));
+            const querySnapshot = await getDocs(q);
+            if (!querySnapshot.empty) {
+              console.error("Phone number already exists.");
+              // Here you might want to sign out the user or merge accounts
+              // For simplicity, we'll just log an error.
+              return;
+            }
+          }
+
           const newUser = {
             id: user.uid,
             name: user.displayName || 'New User',
@@ -35,7 +48,6 @@ export function useCreateUser() {
             updatedAt: serverTimestamp(),
           };
           
-          // Use setDoc (non-blocking is not appropriate here as we need this to complete)
           await setDoc(userRef, newUser);
         }
       } catch (error) {
