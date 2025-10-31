@@ -1,6 +1,8 @@
+
 'use client';
 
 import { Package, ShoppingCart, Tag, Shirt, Smartphone, Headphones, Gift, ToyBrick } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const icons = [
   { Icon: Package, size: 'w-16 h-16', style: { top: '10%', left: '10%', animationDelay: '0s' } },
@@ -18,13 +20,17 @@ const icons = [
   { Icon: Shirt, size: 'w-12 h-12', style: { top: '95%', left: '90%', animationDelay: '11s' } },
 ];
 
-const FloatingShapes = () => {
+type FloatingShapesProps = {
+  opacity?: string;
+}
+
+const FloatingShapes = ({ opacity = 'opacity-10' }: FloatingShapesProps) => {
   return (
     <div className="absolute inset-0 w-full h-full overflow-hidden z-0">
       <ul className="floating-shapes">
         {icons.map((item, index) => (
           <li key={index}>
-            <item.Icon className={`${item.size} text-primary/10`} style={item.style} />
+            <item.Icon className={cn(item.size, 'text-primary', opacity)} style={item.style} />
           </li>
         ))}
       </ul>
